@@ -1,3 +1,3 @@
 # cge-webwidget
-Fancy looking html-css-js widget for obs streams 
+Fancy looking html-css-js widget for obs streams -
 no work was made for this and was made with ai thanks to god this even works
