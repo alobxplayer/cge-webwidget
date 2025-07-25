@@ -13,25 +13,29 @@
         }
         
         body {
-            background: linear-gradient(135deg, #000000, #1a1a1a);
+            background: transparent;
             font-family: 'Segoe UI', 'Roboto', sans-serif;
             color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #000000, #1a1a1a);
             padding: 20px;
         }
         
-        .container {
+       .container {
             width: 100%;
             max-width: 1000px;
-            background: rgba(10, 10, 10, 0.75);
-            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.75); /* Increased transparency */
+            backdrop-filter: blur(20px); /* Increased blur */
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(255, 102, 0, 0.3);
+            position: relative;
+            z-index: 10;
         }
         
         .container::before {
@@ -45,15 +49,18 @@
             background: radial-gradient(circle, rgba(255, 102, 0, 0.15) 0%, transparent 70%);
             z-index: -1;
             pointer-events: none;
-            filter: blur(30px);
+            filter: blur(30px); /* Added blur effect */
         }
         
         .header {
             padding: 25px 30px;
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(10px);
+            background: rgba(20, 20, 20, 0.6); /* Increased transparency */
+            backdrop-filter: blur(10px); /* Added blur */
             border-bottom: 1px solid rgba(255, 102, 0, 0.25);
             text-align: center;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
         }
         
         .header::after {
