@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
+    <title>Clock Interface Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -108,6 +109,10 @@
             text-align: center;
             transition: all 0.3s ease;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .clock-button:hover {
@@ -117,25 +122,13 @@
             background: rgba(30, 30, 30, 0.6);
         }
         
-        .button-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            display: block;
-            color: #ff9933;
-            text-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
-        }
-        
         .button-title {
             font-weight: 600;
             margin-bottom: 10px;
             font-size: 1.4rem;
             letter-spacing: 0.5px;
             color: #ffcc66;
-        }
-        
-        .button-description {
-            margin-bottom: 10px;
-            color: #ffa07a;
+            text-align: center;
         }
         
         .file-info {
@@ -183,42 +176,49 @@
     </style>
 </head>
 <body>
-    <h1>Index</h1>
-    
-    <div class="button-container">
-        <button class="clock-button" onclick="window.location.href='clock_ingame.html'">
-            In-Game Clock
-            <div class="file-info">Added: Jul 25, 2025</div>
-        </button>
+    <div class="container">
+        <div class="header">
+            <h1>Index</h1>
+            <p class="subtitle">Every cycle is now redirecting to askask</p>
+        </div>
         
-        <button class="clock-button" onclick="window.location.href='clock_ingame_event.html'">
-            In-Game Event Clock
-            <div class="file-info">Added: Jul 25, 2025</div>
-        </button>
+        <div class="main-content">
+            <div class="button-container">
+                <button class="clock-button" onclick="window.location.href='clock_ingame.html'">
+                    <div class="button-title">In-Game Clock</div>
+                    <div class="file-info">Added: Jul 25, 2025</div>
+                </button>
+                
+                <button class="clock-button" onclick="window.location.href='clock_ingame_event.html'">
+                    <div class="button-title">In-Game Event Clock</div>
+                    <div class="file-info">Added: Jul 25, 2025</div>
+                </button>
+                
+                <button class="clock-button" onclick="window.location.href='clock_scheduled.html'">
+                    <div class="button-title">Scheduled Clock</div>
+                    <div class="file-info">Added: Jul 25, 2025</div>
+                </button>
+                
+                <button class="clock-button" onclick="window.location.href='clock_scheduled_event.html'">
+                    <div class="button-title">Scheduled Event Clock</div>
+                    <div class="file-info">Added: Jul 25, 2025</div>
+                </button>
+                
+                <button class="clock-button" onclick="window.location.href='clock_scheduled_transparent.html'">
+                    <div class="button-title">Transparent Scheduled Clock</div>
+                    <div class="file-info">Added: Jul 25, 2025</div>
+                </button>
+                
+                <button class="clock-button" onclick="window.location.href='clock_scheduled_transparent_event.html'">
+                    <div class="button-title">Transparent Scheduled Event Clock</div>
+                    <div class="file-info">Added: Jul 25, 2025</div>
+                </button>
+            </div>
+        </div>
         
-        <button class="clock-button" onclick="window.location.href='clock_scheduled.html'">
-            Scheduled Clock
-            <div class="file-info">Added: Jul 25, 2025</div>
-        </button>
-        
-        <button class="clock-button" onclick="window.location.href='clock_scheduled_event.html'">
-            Scheduled Event Clock
-            <div class="file-info">Added: Jul 25, 2025</div>
-        </button>
-        
-        <button class="clock-button" onclick="window.location.href='clock_scheduled_transparent.html'">
-            Transparent Scheduled Clock
-            <div class="file-info">Added: Jul 25, 2025</div>
-        </button>
-        
-        <button class="clock-button" onclick="window.location.href='clock_scheduled_transparent_event.html'">
-            Transparent Scheduled Event Clock 
-            <div class="file-info">Added: Jul 25, 2025</div>
-        </button>
+        <div class="footer">
+            <p></p>
+        </div>
     </div>
-    
-    <footer>
-        &copy; Last updated: Jul 25, 2025 | Event means that door always redirect to askask
-    </footer>
 </body>
 </html>
