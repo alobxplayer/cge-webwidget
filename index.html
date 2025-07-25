@@ -5,182 +5,191 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clock Interface Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background: transparent;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(135deg, #000000, #1a1a1a);
-            padding: 20px;
-        }
-        
-       .container {
-            width: 100%;
-            max-width: 1000px;
-            background: rgba(10, 10, 10, 0.75); /* Increased transparency */
-            backdrop-filter: blur(20px); /* Increased blur */
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 102, 0, 0.3);
-            position: relative;
-            z-index: 10;
-        }
-        
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle, rgba(255, 102, 0, 0.15) 0%, transparent 70%);
-            z-index: -1;
-            pointer-events: none;
-            filter: blur(30px); /* Added blur effect */
-        }
-        
-        .header {
-            padding: 25px 30px;
-            background: rgba(20, 20, 20, 0.6); /* Increased transparency */
-            backdrop-filter: blur(10px); /* Added blur */
-            border-bottom: 1px solid rgba(255, 102, 0, 0.25);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            z-index: 2;
-        }
-        
-        .header::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ff6600, transparent);
-            box-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
+   <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        background: transparent;
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 400;
+        color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow: hidden;
+        background: linear-gradient(135deg, #000000, #1a1a1a);
+        padding: 20px;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1000px;
+        background: rgba(10, 10, 10, 0.75);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        border: 1px solid rgba(255, 102, 0, 0.3);
+        position: relative;
+        z-index: 10;
+    }
+    
+    .container::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(circle, rgba(255, 102, 0, 0.15) 0%, transparent 70%);
+        z-index: -1;
+        pointer-events: none;
+        filter: blur(30px);
+    }
+    
+    .header {
+        padding: 25px 30px;
+        background: rgba(20, 20, 20, 0.6);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 102, 0, 0.25);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        z-index: 2;
+    }
+    
+    .header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ff6600, transparent);
+        box-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
+    }
+    
+    h1 {
+        color: #ff9933;
+        font-size: 3rem;
+        font-weight: 500;
+        margin-bottom: 10px;
+        text-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
+        letter-spacing: 0.5px;
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .subtitle {
+        color: #ffa07a;
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+    
+    .main-content {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+    
+    .button-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        width: 100%;
+    }
+    
+    .clock-button {
+        background: rgba(20, 20, 20, 0.55);
+        backdrop-filter: blur(12px);
+        color: #FFA500;
+        border: 1px solid rgba(255, 102, 0, 0.15);
+        border-radius: 15px;
+        padding: 25px 20px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .clock-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(255, 100, 0, 0.4);
+        border-color: rgba(255, 102, 0, 0.4);
+        background: rgba(30, 30, 30, 0.6);
+    }
+    
+    .button-title {
+        font-weight: 500;
+        margin-bottom: 10px;
+        font-size: 1.4rem;
+        letter-spacing: 0.3px;
+        color: #ffcc66;
+        text-align: center;
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .file-info {
+        font-size: 0.9rem;
+        color: #ffa07a;
+        margin-top: 15px;
+        opacity: 0.8;
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 400;
+    }
+    
+    .footer {
+        padding: 25px;
+        text-align: center;
+        color: #ffa07a;
+        font-size: 0.95rem;
+        width: 100%;
+        background: rgba(20, 20, 20, 0.6);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 102, 0, 0.15);
+        font-weight: 400;
+    }
+    
+    .status-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #7CFC00;
+        border-radius: 50%;
+        margin-right: 8px;
+        box-shadow: 0 0 10px rgba(124, 252, 0, 0.7);
+    }
+    
+    @media (max-width: 768px) {
+        .button-container {
+            grid-template-columns: 1fr;
         }
         
         h1 {
-            color: #ff9933;
-            font-size: 3rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
-            letter-spacing: 1px;
-        }
-        
-        .subtitle {
-            color: #ffa07a;
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .main-content {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-        
-        .button-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            width: 100%;
+            font-size: 2.2rem;
         }
         
         .clock-button {
-            background: rgba(20, 20, 20, 0.55);
-            backdrop-filter: blur(12px);
-            color: #FFA500;
-            border: 1px solid rgba(255, 102, 0, 0.15);
-            border-radius: 15px;
-            padding: 25px 20px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            padding: 20px;
         }
-        
-        .clock-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(255, 100, 0, 0.4);
-            border-color: rgba(255, 102, 0, 0.4);
-            background: rgba(30, 30, 30, 0.6);
-        }
-        
-        .button-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 1.4rem;
-            letter-spacing: 0.5px;
-            color: #ffcc66;
-            text-align: center;
-        }
-        
-        .file-info {
-            font-size: 0.9rem;
-            color: #ffa07a;
-            margin-top: 15px;
-            opacity: 0.8;
-            font-family: Arial, sans-serif;
-        }
-        
-        .footer {
-            padding: 25px;
-            text-align: center;
-            color: #ffa07a;
-            font-size: 0.95rem;
-            width: 100%;
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 102, 0, 0.15);
-        }
-        
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background-color: #7CFC00;
-            border-radius: 50%;
-            margin-right: 8px;
-            box-shadow: 0 0 10px rgba(124, 252, 0, 0.7);
-        }
-        
-        @media (max-width: 768px) {
-            .button-container {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .clock-button {
-                padding: 20px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="container">
