@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Change Tracker</title>
+   <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: transparent;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            color: #ffffff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 102, 0, 0.4);
+            position: relative;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.2) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .header {
+            padding: 25px 30px;
+            background: rgba(20, 20, 20, 0.8);
+            border-bottom: 1px solid rgba(255, 102, 0, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6600, transparent);
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
+        }
+        
+        .utc-label {
+            font-size: 1.3rem;
+            color: #ff9933;
+            font-weight: 500;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+        
+        .clock {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            position: relative;
+        }
+        
+        .clock::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.15) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        .time-part {
+            position: relative;
+            width: 90px;
+            height: 100px;
+            overflow: hidden;
+            margin: 0 5px;
+        }
+        
+        .time-digit {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 102, 0, 0.8);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .time-digit.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .time-separator {
+            font-size: 3.5rem;
+            color: #ff6600;
+            margin: 0 5px;
+            position: relative;
+            top: -8px;
+            opacity: 0.8;
+            text-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
+        }
+        
+        .main-content {
+            display: flex;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .countdown-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-right: 30px;
+            border-right: 1px solid rgba(255, 102, 0, 0.3);
+        }
+        
+        .countdown-label {
+            font-size: 1.5rem;
+            color: #ff9933;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+        
+        .minutes-container {
+            position: relative;
+            height: 120px;
+            width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .minutes-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.2) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        .minutes {
+            font-size: 5rem;
+            font-weight: 800;
+            color: #ff6600;
+            text-shadow: 0 0 25px rgba(255, 102, 0, 0.9);
+            position: absolute;
+            opacity: 0;
+            transform: translateY(30px) scale(0.8);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .minutes.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        
+        .map-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 30px;
+        }
+        
+        .map-info {
+            background: rgba(255, 102, 0, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 102, 0, 0.4);
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .next-map-label {
+            font-size: 1.2rem;
+            color: #ff9933;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px rgba(255, 102, 0, 0.5);
+        }
+        
+        .map-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(255, 102, 0, 0.8);
+            transition: all 0.5s ease;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .map-name.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .change-time {
+            font-size: 1.3rem;
+            color: #ff9933;
+            margin-top: 10px;
+            text-shadow: 0 0 8px rgba(255, 102, 0, 0.3);
+        }
+        
+        .progress-section {
+            padding: 0 30px 30px;
+            position: relative;
+        }
+        
+        .progress-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff6600, transparent);
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+        
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            height: 14px;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 7px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) inset;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6600, #ff3300);
+            border-radius: 7px;
+            width: 0%;
+            transition: width 1s linear;
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.7);
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            font-size: 1rem;
+            color: #ff9933;
+        }
+        
+        /* Glowing effect */
+        .glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at center, rgba(255, 102, 0, 0.4) 0%, transparent 70%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 700px) {
+            .main-content {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .countdown-section {
+                padding-right: 0;
+                padding-bottom: 30px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 102, 0, 0.3);
+            }
+            
+            .map-section {
+                padding-left: 0;
+                padding-top: 30px;
+            }
+            
+            .time-digit {
+                font-size: 3.8rem;
+            }
+            
+            .minutes {
+                font-size: 4.2rem;
+            }
+            
+            .map-name {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="utc-label">CURRENT UTC TIME</div>
+            <div class="clock">
+                <div class="time-part" id="hours">
+                    <div class="time-digit active">00</div>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-part" id="minutes">
+                    <div class="time-digit active">00</div>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-part" id="seconds">
+                    <div class="time-digit active">00</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="countdown-section">
+                <div class="countdown-label">Minutes Until Map Change</div>
+                <div class="minutes-container">
+                    <div id="minutes-display" class="minutes active">60</div>
+                </div>
+            </div>
+            
+            <div class="map-section">
+                <div class="map-info">
+                    <div class="next-map-label">Next Map:</div>
+                    <div id="map-name" class="map-name active">ask</div>
+                    <div class="change-time">Changes at <span id="change-time">13:00</span> UTC</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="progress" class="progress"></div>
+                </div>
+                <div class="progress-text">
+                    <span>Last Map Change</span>
+                    <span>Next Map Change</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+      <script>
+        // Map schedule
+        const mapSchedule = {
+            "00:00": "askask",
+            "01:00": "ask",
+            "02:00": "ask",
+            "03:00": "askask",
+            "04:00": "ask",
+            "05:00": "dustbowl",
+            "06:00": "askask",
+            "07:00": "ask",
+            "08:00": "ask",
+            "09:00": "askask",
+            "10:00": "ask",
+            "11:00": "dustbowl",
+            "12:00": "askask",
+            "13:00": "ask",
+            "14:00": "ask",
+            "15:00": "askask",
+            "16:00": "ask",
+            "17:00": "dustbowl",
+            "18:00": "askask",
+            "19:00": "ask",
+            "20:00": "dustbowl",
+            "21:00": "askask",
+            "22:00": "ask",
+            "23:00": "dustbowl"
+        };
+        
+        // DOM elements (changed to let for mutable references)
+        let minutesDisplay = document.getElementById('minutes-display');
+        let mapNameElement = document.getElementById('map-name');
+        const changeTimeElement = document.getElementById('change-time');
+        const progressElement = document.getElementById('progress');
+        
+        // Previous values
+        let prevHours = '00';
+        let prevMinutes = '00';
+        let prevSeconds = '00';
+        let prevMapMinutes = 60;
+        let currentMap = '';
+        
+        // Update time display with smooth fade animation
+        function updateTimeDisplay(part, value) {
+            const container = document.getElementById(part);
+            const currentDigit = container.querySelector('.time-digit.active');
+            const newDigit = document.createElement('div');
+            newDigit.className = 'time-digit';
+            newDigit.textContent = value;
+            container.appendChild(newDigit);
+            
+            currentDigit.classList.remove('active');
+            
+            setTimeout(() => {
+                newDigit.classList.add('active');
+            }, 10);
+            
+            setTimeout(() => {
+                currentDigit.remove();
+            }, 510);
+        }
+        
+        // Fixed minutes display update
+        function updateMinutesDisplay(value) {
+            const newMinutes = document.createElement('div');
+            newMinutes.className = 'minutes';
+            newMinutes.textContent = value;
+            minutesDisplay.parentElement.appendChild(newMinutes);
+            
+            minutesDisplay.classList.remove('active');
+            
+            setTimeout(() => {
+                newMinutes.classList.add('active');
+            }, 10);
+            
+            setTimeout(() => {
+                minutesDisplay.remove();
+                newMinutes.id = 'minutes-display';
+                minutesDisplay = newMinutes; // Update the reference
+            }, 510);
+        }
+        
+        // Fixed map information update
+        function updateMapInfo() {
+            const now = new Date();
+            const currentHour = now.getUTCHours();
+            const nextHour = (currentHour + 1) % 24;
+            const nextHourStr = nextHour.toString().padStart(2, '0');
+            const nextMap = mapSchedule[`${nextHourStr}:00`];
+            
+            if (nextMap !== currentMap) {
+                const newMap = document.createElement('div');
+                newMap.className = 'map-name';
+                newMap.textContent = nextMap;
+                mapNameElement.parentElement.appendChild(newMap);
+                
+                mapNameElement.classList.remove('active');
+                
+                setTimeout(() => {
+                    newMap.classList.add('active');
+                }, 10);
+                
+                setTimeout(() => {
+                    mapNameElement.remove();
+                    newMap.id = 'map-name';
+                    mapNameElement = newMap; // Update the reference
+                    currentMap = nextMap;
+                }, 510);
+            }
+            
+            changeTimeElement.textContent = `${nextHourStr}:00`;
+        }
+        
+        // Update all display elements
+        function updateDisplay() {
+            const now = new Date();
+            const hours = now.getUTCHours().toString().padStart(2, '0');
+            const minutes = now.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = now.getUTCSeconds().toString().padStart(2, '0');
+            
+            if (hours !== prevHours) {
+                updateTimeDisplay('hours', hours);
+                prevHours = hours;
+            }
+            
+            if (minutes !== prevMinutes) {
+                updateTimeDisplay('minutes', minutes);
+                prevMinutes = minutes;
+            }
+            
+            if (seconds !== prevSeconds) {
+                updateTimeDisplay('seconds', seconds);
+                prevSeconds = seconds;
+            }
+            
+            const secondsUntilNextHour = (60 - now.getUTCMinutes()) * 60 - now.getUTCSeconds();
+            const minutesUntilNextHour = Math.floor(secondsUntilNextHour / 60);
+            
+            if (prevMapMinutes !== minutesUntilNextHour) {
+                updateMinutesDisplay(minutesUntilNextHour);
+                prevMapMinutes = minutesUntilNextHour;
+            }
+            
+            const progressPercentage = 100 - (secondsUntilNextHour / 3600 * 100);
+            progressElement.style.width = `${progressPercentage}%`;
+            
+            if (now.getUTCSeconds() === 0) {
+                updateMapInfo();
+            }
+        }
+        
+        // Initialize
+        function init() {
+            const now = new Date();
+            const nextHour = (now.getUTCHours() + 1) % 24;
+            const nextHourStr = nextHour.toString().padStart(2, '0');
+            mapNameElement.textContent = mapSchedule[`${nextHourStr}:00`];
+            currentMap = mapNameElement.textContent;
+            changeTimeElement.textContent = `${nextHourStr}:00`;
+            
+            updateDisplay();
+            setInterval(updateDisplay, 1000);
+            
+            // Add page reload every 3 minutes (180000 ms)
+            setInterval(() => { location.reload(); }, 180000);
+        }
+        
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

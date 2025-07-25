@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Change Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: transparent;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            color: #ffffff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(10, 10, 10, 0.75); /* Increased transparency */
+            backdrop-filter: blur(20px); /* Increased blur */
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 102, 0, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(30px); /* Added blur effect */
+        }
+        
+        .header {
+            padding: 25px 30px;
+            background: rgba(20, 20, 20, 0.6); /* Increased transparency */
+            backdrop-filter: blur(10px); /* Added blur */
+            border-bottom: 1px solid rgba(255, 102, 0, 0.25);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6600, transparent);
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
+        }
+        
+        .utc-label {
+            font-size: 1.3rem;
+            color: #ff9933;
+            font-weight: 500;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+        
+        .clock {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            position: relative;
+        }
+        
+        .clock::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(15px); /* Added blur effect */
+        }
+        
+        .time-part {
+            position: relative;
+            width: 90px;
+            height: 100px;
+            overflow: hidden;
+            margin: 0 5px;
+        }
+        
+        .time-digit {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 102, 0, 0.8);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .time-digit.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .time-separator {
+            font-size: 3.5rem;
+            color: #ff6600;
+            margin: 0 5px;
+            position: relative;
+            top: -8px;
+            opacity: 0.8;
+            text-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
+        }
+        
+        .main-content {
+            display: flex;
+            padding: 30px;
+            gap: 30px;
+            position: relative;
+        }
+        
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.08) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(25px); /* Added blur effect */
+        }
+        
+        .schedule-section {
+            flex: 1.4;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: rgba(20, 20, 20, 0.55); /* Increased transparency */
+            backdrop-filter: blur(12px); /* Added blur */
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 102, 0, 0.15);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .schedule-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff6600, transparent);
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+        
+        .schedule-header {
+            font-size: 1.5rem;
+            color: #ff9933;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+        
+        .schedule-container {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 102, 0, 0.15);
+            background: rgba(10, 10, 10, 0.45); /* Increased transparency */
+            backdrop-filter: blur(8px); /* Added blur */
+        }
+        
+        .schedule-list {
+            position: relative;
+            height: 100%;
+            overflow-y: auto;
+            padding: 0;
+            margin: 0;
+            scroll-behavior: smooth;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 102, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            background: rgba(15, 15, 15, 0.4); /* Increased transparency */
+        }
+        
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+        
+        .schedule-time {
+            color: #ff9933;
+            font-weight: 500;
+            min-width: 80px;
+            font-size: 1.2rem;
+        }
+        
+        .schedule-map {
+            color: #ffffff;
+            font-weight: 500;
+            text-align: right;
+            flex-grow: 1;
+            font-size: 1.2rem;
+        }
+        
+        .current-schedule {
+            background: rgba(255, 102, 0, 0.2); /* Increased transparency */
+            border-left: 4px solid #ff6600;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+        }
+        
+        .current-schedule .schedule-time {
+            color: #ffffff;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.7);
+        }
+        
+        .current-schedule .schedule-map {
+            color: #ffcc66;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+        }
+        
+        .schedule-center-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff6600, transparent);
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.7);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .countdown-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(20, 20, 20, 0.55); /* Increased transparency */
+            backdrop-filter: blur(12px); /* Added blur */
+            border-radius: 15px;
+            border: 1px solid rgba(255, 102, 0, 0.15);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .countdown-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(20px); /* Added blur effect */
+        }
+        
+        .countdown-label {
+            font-size: 1.5rem;
+            color: #ff9933;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+        
+        .minutes-container {
+            position: relative;
+            height: 120px;
+            width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .minutes-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(15px); /* Added blur effect */
+        }
+        
+        .minutes {
+            font-size: 5rem;
+            font-weight: 800;
+            color: #ff6600;
+            text-shadow: 0 0 25px rgba(255, 102, 0, 0.9);
+            position: absolute;
+            opacity: 0;
+            transform: translateY(30px) scale(0.8);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .minutes.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        
+        .next-map-info {
+            background: rgba(255, 102, 0, 0.15); /* Increased transparency */
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 102, 0, 0.3);
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px); /* Added blur */
+        }
+        
+        .next-map-label {
+            font-size: 1.2rem;
+            color: #ff9933;
+            margin-bottom: 10px;
+            text-shadow: 0 0 8px rgba(255, 102, 0, 0.5);
+        }
+        
+        .map-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(255, 102, 0, 0.8);
+            transition: all 0.5s ease;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-section {
+            padding: 0 30px 30px;
+            position: relative;
+        }
+        
+        .progress-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff6600, transparent);
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+        
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            height: 14px;
+            background: rgba(30, 30, 30, 0.6); /* Increased transparency */
+            border-radius: 7px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) inset;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6600, #ff3300);
+            border-radius: 7px;
+            width: 0%;
+            transition: width 1s linear;
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.7);
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            font-size: 1rem;
+            color: #ff9933;
+        }
+        
+        /* Enhanced glow effects */
+        .glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at center, rgba(255, 102, 0, 0.25) 0%, transparent 70%);
+            opacity: 0.3;
+            z-index: -1;
+            filter: blur(40px); /* Increased blur */
+        }
+        
+        .center-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255, 102, 0, 0.2) 0%, transparent 70%);
+            z-index: -2;
+            pointer-events: none;
+            filter: blur(35px); /* Increased blur */
+        }
+        
+        /* Scrollbar styling */
+        .schedule-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .schedule-list::-webkit-scrollbar-track {
+            background: rgba(30, 30, 30, 0.4); /* Increased transparency */
+            border-radius: 4px;
+        }
+        
+        .schedule-list::-webkit-scrollbar-thumb {
+            background: #ff6600;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(255, 102, 0, 0.7);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 850px) {
+            .main-content {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .schedule-section {
+                padding: 15px;
+            }
+            
+            .countdown-section {
+                padding: 15px;
+            }
+            
+            .time-digit {
+                font-size: 3.8rem;
+            }
+            
+            .minutes {
+                font-size: 4.2rem;
+            }
+            
+            .map-name {
+                font-size: 2rem;
+            }
+        }
+        
+        /* Floating particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -100;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 102, 0, 0.15);
+            backdrop-filter: blur(2px);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0.2;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="utc-label">CURRENT UTC TIME</div>
+            <div class="clock">
+                <div class="time-part" id="hours">
+                    <div class="time-digit active">00</div>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-part" id="minutes">
+                    <div class="time-digit active">00</div>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-part" id="seconds">
+                    <div class="time-digit active">00</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Map schedule on the left -->
+            <div class="schedule-section">
+                <div class="schedule-header">Map Schedule</div>
+                <div class="schedule-container">
+                    <div class="schedule-center-line"></div>
+                    <div id="schedule-list" class="schedule-list">
+                        <!-- Schedule items will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Countdown on the right -->
+            <div class="countdown-section">
+                <div class="countdown-label">Minutes Until Change</div>
+                <div class="minutes-container">
+                    <div id="minutes-display" class="minutes active">60</div>
+                </div>
+                <div class="next-map-info">
+                    <div class="next-map-label">Next Map:</div>
+                    <div id="map-name" class="map-name active">ask</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="progress" class="progress"></div>
+                </div>
+                <div class="progress-text">
+                    <span>Last Map Change</span>
+                    <span>Next Map Change</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+   <script>
+    // map schedules
+    const mapSchedule = {
+            "00:00": "askask",
+            "01:00": "askask",
+            "02:00": "askask",
+            "03:00": "askask",
+            "04:00": "askask",
+            "05:00": "askask",
+            "06:00": "askask",
+            "07:00": "askask",
+            "08:00": "askask",
+            "09:00": "askask",
+            "10:00": "askask",
+            "11:00": "askask",
+            "12:00": "askask",
+            "13:00": "askask",
+            "14:00": "askask",
+            "15:00": "askask",
+            "16:00": "askask",
+            "17:00": "askask",
+            "18:00": "askask",
+            "19:00": "askask",
+            "20:00": "askask",
+            "21:00": "askask",
+            "22:00": "askask",
+            "23:00": "askask"
+        };
+    
+    // let
+    let minutesDisplay = document.getElementById('minutes-display');
+    let mapNameElement = document.getElementById('map-name');
+    const progressElement = document.getElementById('progress');
+    const scheduleList = document.getElementById('schedule-list');
+    
+    // values
+    let prevHours = '00';
+    let prevMinutes = '00';
+    let prevSeconds = '00';
+    let prevMapMinutes = 60;
+    let currentMap = '';
+    let lastScheduleHour = -1;
+    
+    // upd 
+    function updateTimeDisplay(part, value) {
+        const container = document.getElementById(part);
+        const currentDigit = container.querySelector('.time-digit.active');
+        
+        // upd value changes
+        if (currentDigit && currentDigit.textContent !== value) {
+            const newDigit = document.createElement('div');
+            newDigit.className = 'time-digit';
+            newDigit.textContent = value;
+            container.appendChild(newDigit);
+            
+            currentDigit.classList.remove('active');
+            
+            setTimeout(() => {
+                newDigit.classList.add('active');
+            }, 10);
+            
+            setTimeout(() => {
+                if (currentDigit.parentNode === container) {
+                    container.removeChild(currentDigit);
+                }
+            }, 510);
+        }
+    }
+    
+    // aminations
+    function updateMinutesDisplay(value) {
+        // upd value changes
+        if (minutesDisplay && minutesDisplay.textContent !== value.toString()) {
+            const newMinutes = document.createElement('div');
+            newMinutes.className = 'minutes';
+            newMinutes.textContent = value;
+            minutesDisplay.parentElement.appendChild(newMinutes);
+            
+            minutesDisplay.classList.remove('active');
+            
+            setTimeout(() => {
+                newMinutes.classList.add('active');
+            }, 10);
+            
+            setTimeout(() => {
+                if (minutesDisplay.parentNode) {
+                    minutesDisplay.remove();
+                }
+                newMinutes.id = 'minutes-display';
+                minutesDisplay = newMinutes; // upd ref
+            }, 510);
+        }
+    }
+    
+    // upd map info
+    function updateMapInfo() {
+        const now = new Date();
+        const currentHour = now.getUTCHours();
+        const nextHour = (currentHour + 1) % 24;
+        const nextHourStr = nextHour.toString().padStart(2, '0');
+        const nextMap = mapSchedule[`${nextHourStr}:00`];
+        
+        // upd map
+        if (nextMap !== currentMap && mapNameElement) {
+            const newMap = document.createElement('div');
+            newMap.className = 'map-name';
+            newMap.textContent = nextMap;
+            mapNameElement.parentElement.appendChild(newMap);
+            
+            mapNameElement.classList.remove('active');
+            
+            setTimeout(() => {
+                newMap.classList.add('active');
+            }, 10);
+            
+            setTimeout(() => {
+                if (mapNameElement.parentNode) {
+                    mapNameElement.remove();
+                }
+                newMap.id = 'map-name';
+                mapNameElement = newMap; // upd ref
+                currentMap = nextMap;
+            }, 510);
+        }
+    }
+    
+    // scroll map list to centre
+    function updateScheduleList() {
+        const now = new Date();
+        const currentUTCHour = now.getUTCHours();
+        
+        // update if hour changed i suppose
+        if (currentUTCHour !== lastScheduleHour && scheduleList) {
+            lastScheduleHour = currentUTCHour;
+            scheduleList.innerHTML = '';
+            
+            let currentItemIndex = -1;
+            for (let i = 0; i < 24; i++) {
+                const hour = i;
+                const hourStr = hour.toString().padStart(2, '0');
+                const timeString = `${hourStr}:00`;
+                const mapName = mapSchedule[timeString];
+                
+                const scheduleItem = document.createElement('div');
+                scheduleItem.className = 'schedule-item';
+                scheduleItem.dataset.time = timeString;
+                
+                if (hour === currentUTCHour) {
+                    scheduleItem.classList.add('current-schedule');
+                    currentItemIndex = i;
+                }
+                
+                scheduleItem.innerHTML = `
+                    <div class="schedule-time">${timeString}</div>
+                    <div class="schedule-map">${mapName}</div>
+                `;
+                
+                scheduleList.appendChild(scheduleItem);
+            }
+            
+            if (currentItemIndex !== -1) {
+                const items = scheduleList.querySelectorAll('.schedule-item');
+                if (items.length > 0) {
+                    const itemHeight = items[0].offsetHeight;
+                    const containerHeight = scheduleList.offsetHeight;
+                    const scrollPosition = (currentItemIndex * itemHeight) - (containerHeight / 2) + (itemHeight / 2);
+                    
+                    scheduleList.scrollTo({
+                        top: scrollPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+    }
+    
+    // update
+    function updateDisplay() {
+        const now = new Date();
+        const hours = now.getUTCHours().toString().padStart(2, '0');
+        const minutes = now.getUTCMinutes().toString().padStart(2, '0');
+        const seconds = now.getUTCSeconds().toString().padStart(2, '0');
+        if (hours !== prevHours) {
+            updateTimeDisplay('hours', hours);
+            prevHours = hours;
+        }
+        if (minutes !== prevMinutes) {
+            updateTimeDisplay('minutes', minutes);
+            prevMinutes = minutes;
+        }
+        if (seconds !== prevSeconds) {
+            updateTimeDisplay('seconds', seconds);
+            prevSeconds = seconds;
+        }
+        const secondsUntilNextHour = (60 - now.getUTCMinutes()) * 60 - now.getUTCSeconds();
+        const minutesUntilNextHour = Math.floor(secondsUntilNextHour / 60);
+        
+        if (prevMapMinutes !== minutesUntilNextHour) {
+            updateMinutesDisplay(minutesUntilNextHour);
+            prevMapMinutes = minutesUntilNextHour;
+        }
+        const progressPercentage = 100 - (secondsUntilNextHour / 3600 * 100);
+        if (progressElement) {
+            progressElement.style.width = `${progressPercentage}%`;
+        }
+        if (now.getUTCSeconds() === 0) {
+            updateScheduleList();
+            updateMapInfo();
+        }
+    }
+    
+    // init
+    function init() {
+        const now = new Date();
+        const nextHour = (now.getUTCHours() + 1) % 24;
+        const nextHourStr = nextHour.toString().padStart(2, '0');
+        
+        if (mapNameElement) {
+            mapNameElement.textContent = mapSchedule[`${nextHourStr}:00`];
+            currentMap = mapNameElement.textContent;
+        }
+        
+        updateScheduleList();
+        updateDisplay();
+        
+        // update start
+        setInterval(updateDisplay, 1000);
+        
+        // reload ass page because clock is running too fast 
+        setInterval(() => { location.reload(); }, 180000);
+    }
+    
+    window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
