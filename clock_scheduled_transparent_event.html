@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map Change Tracker</title>
-   <style>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -148,7 +148,6 @@
             padding: 30px;
             gap: 30px;
             position: relative;
-            padding-bottom: 30px;
         }
         
         .main-content::before {
@@ -394,52 +393,6 @@
             justify-content: center;
         }
         
-        .progress-section {
-            padding: 0 30px 30px;
-            position: relative;
-        }
-        
-        .progress-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #ff6600, transparent);
-            box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
-        }
-        
-        .progress-container {
-            margin-top: 15px;
-        }
-        
-        .progress-bar {
-            height: 14px;
-            background: rgba(30, 30, 30, 0.6); /* Increased transparency */
-            border-radius: 7px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) inset;
-        }
-        
-        .progress {
-            height: 100%;
-            background: linear-gradient(90deg, #ff6600, #ff3300);
-            border-radius: 7px;
-            width: 0%;
-            transition: width 1s linear;
-            box-shadow: 0 0 10px rgba(255, 102, 0, 0.7);
-        }
-        
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 12px;
-            font-size: 1rem;
-            color: #ff9933;
-        }
-        
         /* Enhanced glow effects */
         .glow {
             position: absolute;
@@ -542,7 +495,7 @@
     </style>
 </head>
 <body>
-  <div class="glow"></div>
+    <div class="glow"></div>
     
     <div class="container">
         <div class="header">
@@ -588,7 +541,7 @@
         </div>
     </div>
     
-   <script>
+    <script>
     // Map schedule
     const mapSchedule = {
             "00:00": "askask",
@@ -620,7 +573,6 @@
     // DOM elements (changed to let for mutable references)
     let minutesDisplay = document.getElementById('minutes-display');
     let mapNameElement = document.getElementById('map-name');
-    const progressElement = document.getElementById('progress');
     const scheduleList = document.getElementById('schedule-list');
     
     // Previous values
@@ -792,11 +744,6 @@
         if (prevMapMinutes !== minutesUntilNextHour) {
             updateMinutesDisplay(minutesUntilNextHour);
             prevMapMinutes = minutesUntilNextHour;
-        }
-        
-        const progressPercentage = 100 - (secondsUntilNextHour / 3600 * 100);
-        if (progressElement) {
-            progressElement.style.width = `${progressPercentage}%`;
         }
         
         if (now.getUTCSeconds() === 0) {
