@@ -390,7 +390,7 @@
         <source src="pirate.mp3" type="audio/mpeg">
     </audio>
 
-  <script>
+ <script>
     var music = document.getElementById('bgMusic');
     var musicIcon = document.getElementById('music-icon');
     var isPlaying = false;
@@ -400,31 +400,64 @@
         if (isPlaying) {
             music.pause();
             musicIcon.innerHTML = '♪';
+            musicIcon.title = "Play music";
         } else {
-            music.play();
-            musicIcon.innerHTML = '◼';
+            // Try to play and handle any errors
+            var playPromise = music.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(function() {
+                    // Successfully started playback
+                    isPlaying = true;
+                    musicIcon.innerHTML = '◼';
+                    musicIcon.title = "Stop music";
+                }).catch(function(error) {
+                    // Auto-play was prevented, show appropriate UI
+                    musicIcon.innerHTML = '♪';
+                    musicIcon.title = "Click to play (autoplay blocked)";
+                    isPlaying = false;
+                });
+            }
         }
         isPlaying = !isPlaying;
     }
 
-    // Attempt to autoplay music when page loads
-    window.onload = function() {
-        // Try to play music
-        var playPromise = music.play();
+    // Set music volume to a reasonable level
+    music.volume = 0.7;
 
+    // Attempt to autoplay music when page loads
+    window.addEventListener('DOMContentLoaded', function() {
+        // Try to play music with user gesture requirement
+        var playPromise = music.play();
+        
         if (playPromise !== undefined) {
             playPromise.then(function() {
                 // Autoplay succeeded
                 isPlaying = true;
                 musicIcon.innerHTML = '◼';
+                musicIcon.title = "Stop music";
             }).catch(function(error) {
                 // Autoplay was prevented
-                // Set icon to music note
                 musicIcon.innerHTML = '♪';
+                musicIcon.title = "Click to play (autoplay blocked)";
                 isPlaying = false;
+                
+                // Add a visual indicator that interaction is needed
+                musicIcon.style.animation = 'pulse 2s infinite';
+                
+                // Create style for pulse animation
+                var style = document.createElement('style');
+                style.textContent = `
+                    @keyframes pulse {
+                        0% { opacity: 1; }
+                        50% { opacity: 0.6; }
+                        100% { opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
             });
         }
-    };
+    });
 
     // Smooth scrolling for navigation links
     var navLinks = document.querySelectorAll('.nav-links a');
