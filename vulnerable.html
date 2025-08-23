@@ -223,15 +223,14 @@
             height: 50px;
             z-index: 1000;
             cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .music-controls i {
             color: white;
             font-size: 24px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
         }
         
         /* Responsive Design */
@@ -257,12 +256,12 @@
     <!-- Header with Navigation -->
     <header>
         <div class="container">
-            <div class="logo">Smart TV Security Alert</div>
+            <div class="logo">WARNING!</div>
             <div class="nav-links">
-                <a href="#how">How It Happens</a>
-                <a href="#risks">The Risks</a>
-                <a href="#brands">Affected Brands</a>
-                <a href="#protection">Protection</a>
+                <a href="#how">How It happens</a>
+                <a href="#risks">The risks</a>
+                <a href="#brands">Affected manufacturers</a>
+                <a href="#protection">How to avoid this</a>
             </div>
         </div>
     </header>
@@ -270,16 +269,15 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>Your Smart TV or Projector Could Be an Open Door</h1>
-            <p>Vulnerable ADB Interfaces Expose Popular Devices to Remote Attacks</p>
-            <a href="#protection" class="cta-button">Secure Your Device Now</a>
+            <h1>If you are reading this, instead of malwaring yor device you were sent there</h1>
+            <p>Your device is vulnerable through ADB known as android debug bridge</p>
         </div>
     </section>
 
     <!-- How Section -->
     <section id="how">
         <div class="container">
-            <h2 class="section-title">How Does This Happen?</h2>
+            <h2 class="section-title">What happened????</h2>
             
             <div class="card">
                 <h3>Unsecured ADB Interfaces</h3>
@@ -287,8 +285,8 @@
             </div>
             
             <div class="card">
-                <h3>Manufacturer Oversight</h3>
-                <p>Manufacturers sometimes enable ADB by default for user convenience but neglect to secure it behind a firewall. With basic scanning tools, hackers can easily locate these exposed devices that are connected to the internet.</p>
+                <h3>Manufacturer error</h3>
+                <p>Manufacturers sometimes enable ADB by default for testing purposes but may forget to disable it. With basic scanning tools, hackers can easily locate these exposed devices that are connected to the internet.</p>
             </div>
         </div>
     </section>
@@ -296,7 +294,7 @@
     <!-- Risks Section -->
     <section id="risks">
         <div class="container">
-            <h2 class="section-title">The Risks to You</h2>
+            <h2 class="section-title">The risks to You</h2>
             
             <div class="risk-grid">
                 <div class="risk-item">
@@ -328,16 +326,16 @@
             <h2 class="section-title">Is Your Device at Risk?</h2>
             
             <div class="card">
-                <h3>Affected Brands</h3>
+                <h3>Affected manufacturers</h3>
                 <p>Brands like TCL, HiSense, Xiaomi, and many smaller Android projector manufacturers have models that are affected. Any device with an unsecured ADB port is at risk.</p>
             </div>
             
             <div class="brand-list">
                 <div class="brand-item">TCL</div>
-                <div class="brand-item">HiSense</div>
+                <div class="brand-item">Hisense</div>
                 <div class="brand-item">Xiaomi</div>
-                <div class="brand-item">Android Projectors</div>
-                <div class="brand-item">Other Chinese Brands</div>
+                <div class="brand-item">Noname projectors</div>
+                <div class="brand-item">Other chinese devices</div>
             </div>
         </div>
     </section>
@@ -378,13 +376,13 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>This is an educational resource. Always practice good digital security hygiene.</p>
+            <p>a friendly catgirl hacker. </p>
         </div>
     </footer>
 
     <!-- Music Controls -->
     <div class="music-controls" onclick="toggleMusic()">
-        <i class="fas fa-volume-up" id="music-icon"></i>
+        <i id="music-icon">♪</i>
     </div>
 
     <!-- Audio Element -->
@@ -402,26 +400,30 @@
         function toggleMusic() {
             if (isPlaying) {
                 music.pause();
-                musicIcon.className = 'fas fa-volume-mute';
+                musicIcon.innerHTML = '♪';
             } else {
                 music.play();
-                musicIcon.className = 'fas fa-volume-up';
+                musicIcon.innerHTML = '◼';
             }
             isPlaying = !isPlaying;
         }
         
-        // Try to autoplay music when page loads (may not work on all browsers)
+        // Try to autoplay music when page loads
         window.onload = function() {
-            setTimeout(function() {
-                music.play().then(function() {
+            // First try to play immediately
+            var promise = music.play();
+            
+            if (promise !== undefined) {
+                promise.then(function() {
+                    // Autoplay started successfully
                     isPlaying = true;
-                    musicIcon.className = 'fas fa-volume-up';
+                    musicIcon.innerHTML = '◼';
                 }).catch(function(error) {
-                    // Autoplay was prevented, show muted icon
-                    musicIcon.className = 'fas fa-volume-mute';
+                    // Autoplay was prevented, show play icon
+                    musicIcon.innerHTML = '♪';
                     isPlaying = false;
                 });
-            }, 1000);
+            }
         };
         
         // Smooth scrolling for navigation links
