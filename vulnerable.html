@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart TV Security Alert</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0a0a;
+            color: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header */
+        header {
+            background-color: #121212;
+            padding: 15px 0;
+            border-bottom: 2px solid #ff5500;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            color: #ff5500;
+            font-weight: bold;
+            font-size: 22px;
+        }
+        
+        /* Navigation */
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .nav-links a {
+            color: #f5f5f5;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 5px 10px;
+            border: 1px solid #ff5500;
+            border-radius: 4px;
+        }
+        
+        .nav-links a:hover {
+            background-color: #ff5500;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            background: #121212;
+            margin-top: 60px;
+        }
+        
+        .hero h1 {
+            color: #ff5500;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(255, 85, 0, 0.7);
+        }
+        
+        .hero p {
+            color: #cccccc;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #ff5500;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        
+        .cta-button:hover {
+            background-color: #ff7b00;
+        }
+        
+        /* Section Styling */
+        section {
+            padding: 50px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ff5500;
+            font-size: 24px;
+        }
+        
+        /* Content Cards */
+        .card {
+            background-color: #1a1a1a;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff5500;
+        }
+        
+        .card h3 {
+            color: #ff5500;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .card p {
+            color: #cccccc;
+            margin-bottom: 15px;
+        }
+        
+        /* Risk Grid */
+        .risk-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .risk-item {
+            width: 48%;
+            background-color: #1a1a1a;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-top: 3px solid #ff5500;
+            border-radius: 5px;
+        }
+        
+        .risk-item h3 {
+            color: #ff5500;
+            margin-bottom: 10px;
+        }
+        
+        /* Brand List */
+        .brand-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .brand-item {
+            background-color: rgba(255, 123, 0, 0.2);
+            padding: 10px 20px;
+            margin: 0 10px 10px 0;
+            border-radius: 20px;
+            border: 1px solid #ff5500;
+        }
+        
+        /* Steps */
+        .steps {
+            margin-top: 30px;
+        }
+        
+        .step {
+            background-color: #1a1a1a;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            position: relative;
+            padding-left: 70px;
+        }
+        
+        .step-number {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            width: 40px;
+            height: 40px;
+            background: #ff5500;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #121212;
+            padding: 30px 0;
+            text-align: center;
+            border-top: 1px solid #ff5500;
+        }
+        
+        footer p {
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+        
+        /* Music Controls */
+        .music-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 85, 0, 0.8);
+            padding: 10px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        
+        .music-controls i {
+            color: white;
+            font-size: 24px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .risk-item {
+                width: 100%;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links a {
+                margin: 5px 0;
+                width: 80%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation -->
+    <header>
+        <div class="container">
+            <div class="logo">Smart TV Security Alert</div>
+            <div class="nav-links">
+                <a href="#how">How It Happens</a>
+                <a href="#risks">The Risks</a>
+                <a href="#brands">Affected Brands</a>
+                <a href="#protection">Protection</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Your Smart TV or Projector Could Be an Open Door</h1>
+            <p>Vulnerable ADB Interfaces Expose Popular Devices to Remote Attacks</p>
+            <a href="#protection" class="cta-button">Secure Your Device Now</a>
+        </div>
+    </section>
+
+    <!-- How Section -->
+    <section id="how">
+        <div class="container">
+            <h2 class="section-title">How Does This Happen?</h2>
+            
+            <div class="card">
+                <h3>Unsecured ADB Interfaces</h3>
+                <p>The Android Debug Bridge (ADB) feature, which is intended for developers to test their apps, is often left open and accessible from the internet. This oversight creates a significant vulnerability, allowing hackers from anywhere in the world to potentially take control of your device.</p>
+            </div>
+            
+            <div class="card">
+                <h3>Manufacturer Oversight</h3>
+                <p>Manufacturers sometimes enable ADB by default for user convenience but neglect to secure it behind a firewall. With basic scanning tools, hackers can easily locate these exposed devices that are connected to the internet.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Risks Section -->
+    <section id="risks">
+        <div class="container">
+            <h2 class="section-title">The Risks to You</h2>
+            
+            <div class="risk-grid">
+                <div class="risk-item">
+                    <h3>Spying & Privacy Invasion</h3>
+                    <p>Intruders can quietly turn on your device's camera and microphone, effectively transforming your TV into a surveillance tool.</p>
+                </div>
+                
+                <div class="risk-item">
+                    <h3>Data Theft</h3>
+                    <p>Hackers can access and steal personal files, photos, and sensitive information stored on your device.</p>
+                </div>
+                
+                <div class="risk-item">
+                    <h3>Malware Installation</h3>
+                    <p>Attackers can install harmful software, ransomware, or crypto-mining programs that can slow down your device.</p>
+                </div>
+                
+                <div class="risk-item">
+                    <h3>Botnet Enrollment</h3>
+                    <p>Your device could be taken over and used as part of a larger network (botnet) to launch attacks on other websites and systems.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brands Section -->
+    <section id="brands">
+        <div class="container">
+            <h2 class="section-title">Is Your Device at Risk?</h2>
+            
+            <div class="card">
+                <h3>Affected Brands</h3>
+                <p>Brands like TCL, HiSense, Xiaomi, and many smaller Android projector manufacturers have models that are affected. Any device with an unsecured ADB port is at risk.</p>
+            </div>
+            
+            <div class="brand-list">
+                <div class="brand-item">TCL</div>
+                <div class="brand-item">HiSense</div>
+                <div class="brand-item">Xiaomi</div>
+                <div class="brand-item">Android Projectors</div>
+                <div class="brand-item">Other Chinese Brands</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Protection Section -->
+    <section id="protection">
+        <div class="container">
+            <h2 class="section-title">Protect Yourself Immediately</h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Disable ADB/Developer Options</h3>
+                    <p>Head to your device's settings menu (usually found under "System" or "About"). Look for "Developer Options" and turn them off. This is the most crucial step you can take.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Update Your Device Firmware</h3>
+                    <p>Check for system updates regularly. Manufacturers often release security patches to address known vulnerabilities.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Use a Network Firewall</h3>
+                    <p>Configure your router to block unnecessary incoming connections. Consider using a dedicated firewall device for added protection.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Disconnect When Not in Use</h3>
+                    <p>If possible, disconnect your smart TV or projector from the internet when you're not using streaming services.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>This is an educational resource. Always practice good digital security hygiene.</p>
+        </div>
+    </footer>
+
+    <!-- Music Controls -->
+    <div class="music-controls" onclick="toggleMusic()">
+        <i class="fas fa-volume-up" id="music-icon"></i>
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="bgMusic" loop>
+        <source src="pirate.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Simple JavaScript for older browser compatibility
+        var music = document.getElementById('bgMusic');
+        var musicIcon = document.getElementById('music-icon');
+        var isPlaying = false;
+        
+        // Function to toggle music
+        function toggleMusic() {
+            if (isPlaying) {
+                music.pause();
+                musicIcon.className = 'fas fa-volume-mute';
+            } else {
+                music.play();
+                musicIcon.className = 'fas fa-volume-up';
+            }
+            isPlaying = !isPlaying;
+        }
+        
+        // Try to autoplay music when page loads (may not work on all browsers)
+        window.onload = function() {
+            setTimeout(function() {
+                music.play().then(function() {
+                    isPlaying = true;
+                    musicIcon.className = 'fas fa-volume-up';
+                }).catch(function(error) {
+                    // Autoplay was prevented, show muted icon
+                    musicIcon.className = 'fas fa-volume-mute';
+                    isPlaying = false;
+                });
+            }, 1000);
+        };
+        
+        // Smooth scrolling for navigation links
+        var navLinks = document.querySelectorAll('.nav-links a');
+        for (var i = 0; i < navLinks.length; i++) {
+            navLinks[i].addEventListener('click', function(e) {
+                e.preventDefault();
+                var targetId = this.getAttribute('href');
+                var targetElement = document.querySelector(targetId);
+                window.scrollTo({
+                    top: targetElement.offsetTop - 70,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    </script>
+</body>
+</html>
