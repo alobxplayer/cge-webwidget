@@ -390,55 +390,55 @@
         <source src="pirate.mp3" type="audio/mpeg">
     </audio>
 
-    <script>
-        // Simple JavaScript for older browser compatibility
-        var music = document.getElementById('bgMusic');
-        var musicIcon = document.getElementById('music-icon');
-        var isPlaying = false;
-        
-        // Function to toggle music
-        function toggleMusic() {
-            if (isPlaying) {
-                music.pause();
-                musicIcon.innerHTML = '♪';
-            } else {
-                music.play();
-                musicIcon.innerHTML = '◼';
-            }
-            isPlaying = !isPlaying;
+  <script>
+    var music = document.getElementById('bgMusic');
+    var musicIcon = document.getElementById('music-icon');
+    var isPlaying = false;
+
+    // Function to toggle music
+    function toggleMusic() {
+        if (isPlaying) {
+            music.pause();
+            musicIcon.innerHTML = '♪';
+        } else {
+            music.play();
+            musicIcon.innerHTML = '◼';
         }
-        
-        // Try to autoplay music when page loads
-        window.onload = function() {
-            // First try to play immediately
-            var promise = music.play();
-            
-            if (promise !== undefined) {
-                promise.then(function() {
-                    // Autoplay started successfully
-                    isPlaying = true;
-                    musicIcon.innerHTML = '◼';
-                }).catch(function(error) {
-                    // Autoplay was prevented, show play icon
-                    musicIcon.innerHTML = '♪';
-                    isPlaying = false;
-                });
-            }
-        };
-        
-        // Smooth scrolling for navigation links
-        var navLinks = document.querySelectorAll('.nav-links a');
-        for (var i = 0; i < navLinks.length; i++) {
-            navLinks[i].addEventListener('click', function(e) {
-                e.preventDefault();
-                var targetId = this.getAttribute('href');
-                var targetElement = document.querySelector(targetId);
-                window.scrollTo({
-                    top: targetElement.offsetTop - 70,
-                    behavior: 'smooth'
-                });
+        isPlaying = !isPlaying;
+    }
+
+    // Attempt to autoplay music when page loads
+    window.onload = function() {
+        // Try to play music
+        var playPromise = music.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(function() {
+                // Autoplay succeeded
+                isPlaying = true;
+                musicIcon.innerHTML = '◼';
+            }).catch(function(error) {
+                // Autoplay was prevented
+                // Set icon to music note
+                musicIcon.innerHTML = '♪';
+                isPlaying = false;
             });
         }
-    </script>
+    };
+
+    // Smooth scrolling for navigation links
+    var navLinks = document.querySelectorAll('.nav-links a');
+    for (var i = 0; i < navLinks.length; i++) {
+        navLinks[i].addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetId = this.getAttribute('href');
+            var targetElement = document.querySelector(targetId);
+            window.scrollTo({
+                top: targetElement.offsetTop - 70,
+                behavior: 'smooth'
+            });
+        });
+    }
+</script>
 </body>
 </html>
